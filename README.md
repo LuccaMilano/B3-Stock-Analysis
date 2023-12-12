@@ -9,4 +9,5 @@ Usage: ./main <stock-name> <Price to Sell> <Price to Buy>
 Example: ./main PETR4 22.67 22.59
 
 Compilation: g++ -I<path-to-curl-include> -o main cpp/Mail.cpp main.cpp -L<path-to-curl-lib> -lcurl
+
 *The application needs the library curl, from c++ to compile. Can be found in: https://curl.se/
