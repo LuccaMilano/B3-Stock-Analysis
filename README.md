@@ -6,7 +6,7 @@ The application sends an email, based on a config file, with the destination + S
 The email will contain the instructions to either buy or sell a certain active of the stock market, based on prices informed to the program.
 
 
-Usage: ./main <stock-name> <price-to-sell> <price-to-buy>
+Usage: ./main 'stock-name' 'price-to-sell' \<price-to-buy\>
 
 Example: ./main PETR4 22.67 22.59
 
