@@ -17,6 +17,13 @@ int main(int argc, char *argv[]){
 
     cout << stock << " " << sellPrice << " "<< buyPrice;
 
+    // Check if the price of the stock is whithin range
+    std::string symbol = argv[1];
+    double threshold = std::stod(argv[2]);
+
+    StockAnalysis StockAnalysis(symbol, sellPrice, buyPrice);
+    StockAnalysis.run();
+/*
     // Send the mail
     EmailSender emailSender;
     const char* senderEmail = "mockup430@gmail.com";
@@ -25,6 +32,6 @@ int main(int argc, char *argv[]){
     const char* emailBody = "Hello, this is a test email from C++ using libcurl.";
 
     emailSender.sendEmail(senderEmail, recipientEmail, emailSubject, emailBody);
-
+*/
     return 0;
 }

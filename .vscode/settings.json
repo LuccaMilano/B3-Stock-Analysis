@@ -56,6 +56,10 @@
         "set": "cpp",
         "iomanip": "cpp",
         "mutex": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "forward_list": "cpp",
+        "any": "cpp",
+        "string_view": "cpp",
+        "valarray": "cpp"
     }
 }
