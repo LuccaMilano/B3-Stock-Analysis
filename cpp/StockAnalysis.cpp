@@ -32,7 +32,7 @@ size_t StockAnalysis::WriteCallback(void* contents, size_t size, size_t nmemb, v
     return realsize;
 }
 
-void StockAnalysis::checkStockPrice() {
+int StockAnalysis::checkStockPrice() {
     if (curl_) {
         std::string url = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=" + symbol_ + "&apikey=W69EFB1QD6AL04I2";
 
@@ -62,34 +62,27 @@ void StockAnalysis::checkStockPrice() {
             // Extract the price value from string
             start_pos += price_field.length();
             size_t end_pos = json_data.find("\"", start_pos);
-            std::string price_str = json_data.substr(start_pos, end_pos - start_pos);
-
-            std::cout << "Price: " << price_str << std::endl;          
+            std::string price_str = json_data.substr(start_pos, end_pos - start_pos);       
         
             // Convert the price to a double
             std::cout << "json value: " << json_data << std::endl;
             double current_price = std::stod(price_str);
 
-            // Check if the current price is above the threshold
+            // Check if the current price is above or below the thresholds
             if (current_price > sellPrice_) {
-                std::cout << "Stock " << symbol_ << " has passed the threshold, it's advised to sell. Current price: " << current_price << std::endl;
+                std::cout << "Stock " << symbol_ << " is above the threshold, it's advised to sell. Current price: " << current_price << std::endl;
+                return 1;
             } 
             else if (current_price < buyPrice_) {
                 std::cout << "Stock " << symbol_ << " is below the threshold, it's advised to buy. Current price: " << current_price << std::endl;
+                return 2;
             }
             else {
                 std::cout << "Stock " << symbol_ << " is not above or below the threshold. Current price: " << current_price << std::endl;
+                return 0;
             }
             
         }
-    }   
-}
-
-void StockAnalysis::run() {
-    while (true) {
-        checkStockPrice();
-
-        // Sleep for some time before checking again
-        std::this_thread::sleep_for(std::chrono::minutes(1));
     }
+    return -1;   
 }

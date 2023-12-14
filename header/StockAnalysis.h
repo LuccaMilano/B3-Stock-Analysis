@@ -17,7 +17,7 @@ public:
     StockAnalysis(const std::string& symbol, double sellPrice, double buyPrice);
     ~StockAnalysis();
 
-    void run();
+    int checkStockPrice();
 
 private:
     std::string symbol_;
@@ -27,9 +27,6 @@ private:
     struct MemoryStruct chunk_;
 
     static size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* userp);
-    void checkStockPrice();
-
-    // Add other private methods or members as needed
 };
 
 

@@ -9,30 +9,21 @@ EmailSender::~EmailSender() {
     cleanup();
 }
 
-// Set config for sending the mail
+// Set SMTP config for sending the mail
 void EmailSender::initialize() {
     curl_global_init(CURL_GLOBAL_DEFAULT);
     curl = curl_easy_init();
 
     if (curl) {
-        //curl_easy_setopt(curl, CURLOPT_URL, "smtps://smtp-mail.outlook.com:587");
+        // Set the mail SMTP and user
         curl_easy_setopt(curl, CURLOPT_URL, "smtps://smtp.gmail.com:465");
         curl_easy_setopt(curl, CURLOPT_USERNAME, "mockup430@gmail.com");
         curl_easy_setopt(curl, CURLOPT_PASSWORD, "hbma qwxz bzxy ccwe");
 
-        // curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
-        // curl_easy_setopt(curl, CURLOPT_USE_SSL, (long)CURLUSESSL_ALL);
-
-        // Enable SSL/TLS
-        curl_easy_setopt(curl, CURLOPT_USE_SSL, CURLUSESSL_ALL);
-
-        // Set the version of TLS to use (TLSv1.2)
-        curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
-
-        // Disable SSL certificate verification (for testing purposes)
+        // Disable SSL certificate verification (shouldn't go to production, testing only)
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-        recipients = nullptr; // Initialize recipients list
+        recipients = nullptr; 
     }
 }
 
@@ -49,6 +40,32 @@ void EmailSender::cleanup() {
     curl_global_cleanup();
 }
 
+// Reads the email data passed through curl
+size_t EmailSender::payloadSource(char* ptr, size_t size, size_t nmemb, void* userp) {
+    const char** payload_text = reinterpret_cast<const char**>(userp);
+
+    if (!payload_text || !(*payload_text)) {
+        return 0;
+    }
+
+    const char* data = *payload_text;
+    size_t len = strlen(data);
+
+
+    if (len > 0) {
+        if (len > size * nmemb) {
+            len = size * nmemb;
+        }
+
+        memcpy(ptr, data, len);
+        *payload_text += len;
+
+        return len;
+    }
+
+    return 0;
+}
+
 // Assemble the mail template and send it 
 void EmailSender::sendEmail(const char* from, const char* to, const char* subject, const char* body) {
     if (curl) {
@@ -56,18 +73,22 @@ void EmailSender::sendEmail(const char* from, const char* to, const char* subjec
         curl_easy_setopt(curl, CURLOPT_MAIL_FROM, from);
         recipients = curl_slist_append(recipients, to);
         curl_easy_setopt(curl, CURLOPT_MAIL_RCPT, recipients);
+        
+        // Format the mail data for the payloadSource
+        std::string emailData = std::string("Subject: ") + subject + "\r\n" +
+                        "From: " + from + "\r\n" +
+                        "To: " + to + "\r\n" +
+                        "\r\n" + body + "\r\n";
 
-        // Set the email subject and body
-        const char* emailData[] = {
-            R"(Subject: )", subject,
-            "\r\n",
-            body
-        };
+        const char* emailDataPtr = emailData.c_str();
 
-        curl_easy_setopt(curl, CURLOPT_READDATA, emailData);
+        // Set the payload function to read the email data
+        curl_easy_setopt(curl, CURLOPT_READFUNCTION, payloadSource);
+        curl_easy_setopt(curl, CURLOPT_READDATA, &emailDataPtr);
         curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
         curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-        // Perform the email send
+
+        // Send the mail
         CURLcode res = curl_easy_perform(curl);
 
         if (res != CURLE_OK) {

@@ -14,24 +14,39 @@ int main(int argc, char *argv[]){
     string stock = argv[1];
     float sellPrice = stof(argv[2]);
     float buyPrice = stof(argv[3]);
+    int mailMessage = -1;
 
-    cout << stock << " " << sellPrice << " "<< buyPrice;
+    StockAnalysis StockAnalysis(stock, sellPrice, buyPrice);
 
-    // Check if the price of the stock is whithin range
-    std::string symbol = argv[1];
-    double threshold = std::stod(argv[2]);
-
-    StockAnalysis StockAnalysis(symbol, sellPrice, buyPrice);
-    StockAnalysis.run();
-/*
     // Send the mail
     EmailSender emailSender;
     const char* senderEmail = "mockup430@gmail.com";
-    const char* recipientEmail = "luccsamilano@gmail.com";
-    const char* emailSubject = "Hey there";
-    const char* emailBody = "Hello, this is a test email from C++ using libcurl.";
+    const char* recipientEmail = "mockup430@gmail.com";
+    const char* emailSubject = "Stock Market Trading";
+    string emailBodySell = "Stock " + stock + " is above the price to sell: " + to_string(sellPrice) + ".";
+    const char* emailBodySellPtr = emailBodySell.c_str();
+    string  emailBodyBuy = "Stock " + stock +  " is below the price to buy: " + to_string(buyPrice) + ".";
+    const char* emailBodyBuyPtr = emailBodyBuy.c_str();
 
-    emailSender.sendEmail(senderEmail, recipientEmail, emailSubject, emailBody);
-*/
+    while (true) {
+        // Check if the price of the stock is whithin range
+        mailMessage = StockAnalysis.checkStockPrice();
+        // Depending on the return code, send messages of buy, sell or no message
+        switch (mailMessage)
+        {
+        case 1: //sell
+            emailSender.sendEmail(senderEmail, recipientEmail, emailSubject, emailBodySellPtr);
+            break;
+        case 2: //buy
+            emailSender.sendEmail(senderEmail, recipientEmail, emailSubject, emailBodyBuyPtr);
+            break;
+        default: //nothing
+            break;
+        }
+
+        // Sleep for some time before checking again
+        std::this_thread::sleep_for(std::chrono::minutes(1));
+    }
+
     return 0;
 }
