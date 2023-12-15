@@ -51,9 +51,9 @@ int main(int argc, char *argv[]){
 
     unordered_map<string, string> config = parseConfigFile("config/config.ini");
 
-    StockAnalysis StockAnalysis(stock, sellPrice, buyPrice);
+    StockAnalysis stockAnalysis(stock, sellPrice, buyPrice);
 
-    // Send the mail
+    // Set the mail messages config (recipient, subject, etc)
     EmailSender emailSender(config["SMTP_URL"]);
     const char* senderEmail = "mockup430@gmail.com";
     const char* recipientEmail = config["Recipient_Email"].c_str();
@@ -65,7 +65,7 @@ int main(int argc, char *argv[]){
 
     while (true) {
         // Check if the price of the stock is whithin range
-        mailMessage = StockAnalysis.checkStockPrice();
+        mailMessage = stockAnalysis.checkStockPrice();
         // Depending on the return code, send messages of buy, sell or no message
         switch (mailMessage)
         {

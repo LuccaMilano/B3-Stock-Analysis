@@ -7,6 +7,8 @@
 #include <chrono>
 #include <curl/curl.h>
 
+using namespace std;
+
 struct MemoryStruct {
     char* memory;
     size_t size;
@@ -14,13 +16,13 @@ struct MemoryStruct {
 
 class StockAnalysis {
 public:
-    StockAnalysis(const std::string& symbol, double sellPrice, double buyPrice);
+    StockAnalysis(const string& symbol, double sellPrice, double buyPrice);
     ~StockAnalysis();
 
     int checkStockPrice();
 
 private:
-    std::string symbol_;
+    string symbol_;
     double sellPrice_;
     double buyPrice_;
     CURL* curl_;

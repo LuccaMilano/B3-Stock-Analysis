@@ -8,6 +8,8 @@ EmailSender::EmailSender(string smtpURL) : smtpURLptr(smtpURL.c_str()){
     if (curl) {
         // Set the mail SMTP and user
         curl_easy_setopt(curl, CURLOPT_URL, smtpURLptr);
+
+        // Hardcoded for the sake of testing, should be environment variables
         curl_easy_setopt(curl, CURLOPT_USERNAME, "mockup430@gmail.com");
         curl_easy_setopt(curl, CURLOPT_PASSWORD, "hbma qwxz bzxy ccwe");
 

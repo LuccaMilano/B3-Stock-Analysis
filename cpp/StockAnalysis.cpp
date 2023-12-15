@@ -1,6 +1,6 @@
 #include "../header/StockAnalysis.h"
 
-StockAnalysis::StockAnalysis(const std::string& symbol, double sellPrice, double buyPrice)
+StockAnalysis::StockAnalysis(const string& symbol, double sellPrice, double buyPrice)
     : symbol_(symbol), sellPrice_(sellPrice), buyPrice_(buyPrice), curl_(nullptr) {
     curl_global_init(CURL_GLOBAL_DEFAULT);
     curl_ = curl_easy_init();
@@ -15,13 +15,14 @@ StockAnalysis::~StockAnalysis() {
     free(chunk_.memory);
 }
 
+// Handle received data (response body) from the server.
 size_t StockAnalysis::WriteCallback(void* contents, size_t size, size_t nmemb, void* userp) {
     size_t realsize = size * nmemb;
     struct MemoryStruct* mem = (struct MemoryStruct*)userp;
 
     mem->memory = (char*)realloc(mem->memory, mem->size + realsize + 1);
     if (mem->memory == NULL) {
-        std::cerr << "Memory allocation error" << std::endl;
+        cerr << "Memory allocation error" << endl;
         return 0;
     }
 
@@ -34,7 +35,7 @@ size_t StockAnalysis::WriteCallback(void* contents, size_t size, size_t nmemb, v
 
 int StockAnalysis::checkStockPrice() {
     if (curl_) {
-        std::string url = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=" + symbol_ + "&apikey=W69EFB1QD6AL04I2";
+        string url = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=" + symbol_ + "&apikey=W69EFB1QD6AL04I2";
 
         curl_easy_setopt(curl_, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYPEER, 0L);
@@ -44,10 +45,10 @@ int StockAnalysis::checkStockPrice() {
         CURLcode res = curl_easy_perform(curl_);
 
         if (res != CURLE_OK) {
-            std::cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << std::endl;
+            cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << endl;
         } 
         else {
-            std::string json_data = chunk_.memory;
+            string json_data = chunk_.memory;
             curl_easy_setopt(curl_, CURLOPT_URL, url.c_str());
 
             curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYPEER, 0L);
@@ -56,29 +57,29 @@ int StockAnalysis::checkStockPrice() {
             curl_easy_setopt(curl_, CURLOPT_WRITEDATA, (void*)&chunk_);
 
             // Parse JSON response to extract stock price
-            std::string price_field = "\"05. price\": \"";
+            string price_field = "\"05. price\": \"";
             size_t start_pos = json_data.find(price_field);
 
             // Extract the price value from string
             start_pos += price_field.length();
             size_t end_pos = json_data.find("\"", start_pos);
-            std::string price_str = json_data.substr(start_pos, end_pos - start_pos);       
+            string price_str = json_data.substr(start_pos, end_pos - start_pos);       
         
             // Convert the price to a double
-            std::cout << "json value: " << json_data << std::endl;
-            double current_price = std::stod(price_str);
+            cout << "json value: " << json_data << endl;
+            double current_price = stod(price_str);
 
             // Check if the current price is above or below the thresholds
             if (current_price > sellPrice_) {
-                std::cout << "Stock " << symbol_ << " is above the threshold, it's advised to sell. Current price: " << current_price << std::endl;
+                cout << "Stock " << symbol_ << " is above the threshold, it's advised to sell. Current price: " << current_price << endl;
                 return 1;
             } 
             else if (current_price < buyPrice_) {
-                std::cout << "Stock " << symbol_ << " is below the threshold, it's advised to buy. Current price: " << current_price << std::endl;
+                cout << "Stock " << symbol_ << " is below the threshold, it's advised to buy. Current price: " << current_price << endl;
                 return 2;
             }
             else {
-                std::cout << "Stock " << symbol_ << " is not above or below the threshold. Current price: " << current_price << std::endl;
+                cout << "Stock " << symbol_ << " is not above or below the threshold. Current price: " << current_price << endl;
                 return 0;
             }
             
