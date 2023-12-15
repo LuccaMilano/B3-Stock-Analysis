@@ -1,11 +1,14 @@
 #ifndef MAIL_H
 #define MAIL_H
 
+#include <iostream>
 #include <curl/curl.h>
+
+using namespace std;
 
 class EmailSender {
 public:
-    EmailSender();
+    EmailSender(string smtpURL);
     ~EmailSender();
 
     void sendEmail(const char* from, const char* to, const char* subject, const char* body);
@@ -14,8 +17,8 @@ public:
 private:
     CURL* curl;
     struct curl_slist* recipients;
+    const char* smtpURLptr;
 
-    void initialize();
     void cleanup();
 };
 

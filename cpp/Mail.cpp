@@ -1,22 +1,13 @@
 #include "../header/Mail.h"
-#include <iostream>
-
-EmailSender::EmailSender() {
-    initialize();
-}
-
-EmailSender::~EmailSender() {
-    cleanup();
-}
 
 // Set SMTP config for sending the mail
-void EmailSender::initialize() {
+EmailSender::EmailSender(string smtpURL) : smtpURLptr(smtpURL.c_str()){
     curl_global_init(CURL_GLOBAL_DEFAULT);
     curl = curl_easy_init();
 
     if (curl) {
         // Set the mail SMTP and user
-        curl_easy_setopt(curl, CURLOPT_URL, "smtps://smtp.gmail.com:465");
+        curl_easy_setopt(curl, CURLOPT_URL, smtpURLptr);
         curl_easy_setopt(curl, CURLOPT_USERNAME, "mockup430@gmail.com");
         curl_easy_setopt(curl, CURLOPT_PASSWORD, "hbma qwxz bzxy ccwe");
 
@@ -25,6 +16,10 @@ void EmailSender::initialize() {
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
         recipients = nullptr; 
     }
+}
+
+EmailSender::~EmailSender() {
+    cleanup();
 }
 
 // Destructor to clean the lists
