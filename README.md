@@ -13,6 +13,7 @@ Example: ./main PETR4.SA 22.67 22.59
 Compilation: g++ -I\<path-to-curl-include\> -o main cpp/Mail.cpp main.cpp -L\<path-to-curl-lib\> -lcurl
 
 *This application needs the library curl, from c++ to compile. Can be found in: https://curl.se/
+
 *This application uses Alpha Vantage API (there's a 15 minutes delay between updates in the stock market). Can be found in: https://www.alphavantage.co/
 
-The config file should have the SMTP url of the chosen mail system (gmail in the example) and the destinatary (in the format written in the example).
+The config file should have the SMTP url of the chosen mail system (gmail in the example) and the destinatary (the format should be written like the example).
